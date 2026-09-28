@@ -19,8 +19,11 @@ from datetime import datetime
 WATCH_DIR = "/home/user/Pictures/PiwigoUploads"
 PIWIGO_URL = "https://images.piwigoserver.org/ws.php?format=json"
 PIWIGO_USER = "replace this with your username" 
-PIWIGO_PASSWORD = "replace this with your password" 
+PIWIGO_PASSWORD = "replace this with your password"
 CATEGORY_ID = 1 
+
+# File extensions permitted for upload. Edit this set to add or remove types.
+ALLOWED_EXTENSIONS = {'.tif', '.jpg', '.jpeg', '.png', '.gif'}
 # ---------------------
 
 class UploadEventHandler(FileSystemEventHandler):
@@ -28,6 +31,11 @@ class UploadEventHandler(FileSystemEventHandler):
         if not event.is_directory:
             file_path = event.src_path
             filename = os.path.basename(file_path)
+            extension = os.path.splitext(filename)[1].lower()
+
+            if extension not in ALLOWED_EXTENSIONS:
+                print(f"-> Ignoring unsupported file type: {filename} ({extension or 'no extension'})")
+                return
             
             print(f"-> [1/4] New file detected: {filename}")
             print(f"-> [2/4] Waiting 2 seconds for disk write to complete...")
